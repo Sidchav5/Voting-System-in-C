@@ -1,0 +1,248 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <windows.h>
+
+
+// Declaring Structures
+
+struct Voters
+{
+    char name[10];
+    int age;
+    char idv[4];
+    bool hasVoted;
+};
+
+struct Candidates
+{
+    char name[10];
+    int age;
+    char party[25];
+    char idc[4];
+};
+
+// Function Declarations
+
+int VoterF(struct Voters *V);
+int CandidateF(struct Candidates *C);
+int Voting(struct Voters *voters, int n, struct Candidates *a1, struct Candidates *a2);
+int VoterR(struct Voters *V);
+int CandidateR(struct Candidates *C);
+
+// Main function
+
+int main()
+{
+    char Choice[4];
+    char Yes[4] = "Yes";
+    int option;
+    int n;
+    printf("Welcome to Voting System!!\n");
+    printf("\n");
+    printf("Enter the number of voters: ");
+    scanf("%d", &n);
+
+    struct Voters voters[n];
+    struct Candidates c1, c2;
+
+    printf("Steps for the Voting process are as follows:\n");
+    printf("Option 1: Fill voters data\n");
+    printf("Option 2: Fill Candidates data\n");
+    printf("Option 3: Voting process\n");
+    printf("Option 4: Read voters data\n");
+    printf("Option 5: Read Candidates data\n");
+
+    do
+    {
+        printf("Enter the option: ");
+        scanf("%d", &option);
+        printf("\n");
+
+        switch (option)
+        {
+        case 1:
+        {
+            for (int i = 0; i < n; i++)
+            {
+                printf("Enter the details of Voter %d\n", i + 1);
+                VoterF(&voters[i]);
+                printf("\n");
+            }
+            break;
+        }
+        case 2:
+        {
+            printf("Enter the details of Candidate 1\n");
+            CandidateF(&c1);
+            printf("\n");
+            printf("Enter the details of Candidate 2\n");
+            CandidateF(&c2);
+            printf("\n");
+            break;
+        }
+        case 3:
+        {
+            printf("Voting Process begins!!\n");
+            Voting(voters, n, &c1, &c2);
+            printf("\n");
+            break;
+        }
+        case 4:
+        {
+            printf("Read the data of voter\n");
+            for (int i = 0; i < n; i++)
+            {
+                VoterR(&voters[i]);
+                printf("\n");
+            }
+            break;
+        }
+        case 5:
+        {
+            printf("Read the data of Candidate\n");
+            CandidateR(&c1);
+            printf("\n");
+            CandidateR(&c2);
+            printf("\n");
+            break;
+        }
+        }
+
+        printf("Do you want to continue (Yes/No)\n");
+        scanf("%s", Choice);
+        printf("\n");
+
+    } while (strcmp(Choice, Yes) == 0);
+
+    return 0;
+}
+
+// Function Definitions
+
+
+// Case 1: Fill the data of voters
+
+int VoterF(struct Voters *V)
+{
+    printf("Enter the name of the new voter: ");
+    scanf("%s", V->name);
+    printf("Enter the age of the new voter: ");
+    scanf("%d", &(V->age));
+
+    if (V->age < 18)
+    {
+        Beep(1500, 2000);
+        printf("Invalid age for voting\n");
+    }
+
+    printf("Enter the id of the new voter: ");
+    scanf("%s", V->idv);
+    V->hasVoted = false;
+}
+
+// Case 2: Fill the data of Candidates
+
+int CandidateF(struct Candidates *C)
+{
+    printf("Enter the name of the candidate: ");
+    scanf("%s", C->name);
+    printf("Enter the age of the candidate: ");
+    scanf("%d", &(C->age));
+
+    if (C->age < 25)
+    {
+        Beep(1500, 2000);
+        printf("Invalid age to Contest Election\n");
+    }
+
+    printf("Enter the party name: ");
+    scanf("%s", C->party);
+    printf("Enter the id of the candidate: ");
+    scanf("%s", C->idc);
+}
+
+// Case 3: Voting Process and Result
+
+int Voting(struct Voters *voters, int n, struct Candidates *a1, struct Candidates *a2)
+{
+    int count1 = 0, count2 = 0;
+
+    for (int i = 0; i < n; i++)  // Outer for loop is used  to run the function  till last numbered voter.
+    {
+        char Voter[4];
+        printf("Enter the voter id no: ");
+        scanf("%s", Voter);
+
+        for (int j = 0; j < n; j++)     // This is used in below statement to read data from voters array
+        {
+            if (strcmp(Voter, voters[j].idv) == 0)     // comparing entred voter id with voter id stored earlier 
+            {
+                if (voters[j].hasVoted == true)
+                {
+                    printf("Voter with ID %s has already voted.\n", Voter);   // if particular voter tries to vote for more than once 
+                    Beep(1500,1000);
+                    break;
+                }
+
+                char Cand[4];
+                printf("Enter the Candidate id no: ");
+                scanf("%s", Cand);
+                Beep(1500, 1000);
+
+                if (strcmp(Cand, a1->idc) == 0)
+                {
+                    count1++;
+                }
+                else if (strcmp(Cand, a2->idc) == 0)
+                {
+                    count2++;
+                }
+                else
+                {
+                    printf("Enter proper candidate id no.\n");
+                    n++;
+                }
+
+                voters[j].hasVoted = true;    // making boolean variable true after particular voter has voted for first time
+                break;
+            }
+            else 
+            {
+                printf("Enter proper voter id \n");
+            }
+        }
+    }
+
+    if (count1 > count2)
+    {
+        printf("Candidate %s is the winner from %s party with %d votes.\n", a1->name, a1->party, count1);
+    }
+    else if (count1 < count2)
+    {
+        printf("Candidate %s is the winner from %s party with %d votes.\n", a2->name, a2->party, count2);
+    }
+    else
+    {
+        printf("Result has been TIED!!!\n");
+    }
+}
+
+// Case 4: Read Voters Data
+
+int VoterR(struct Voters *V)
+{
+    printf("Name of voter is %s\n", V->name);
+    printf("Age of voter is %d\n", V->age);
+    printf("Id of voter is %s\n", V->idv);
+}
+
+// Case 5: Read Candidate Data
+
+int CandidateR(struct Candidates *C)
+{
+    printf("Name of Candidate %s\n", C->name);
+    printf("Age of Candidate %d\n", C->age);
+    printf("Party of Candidate %s\n", C->party);
+    printf("ID of Candidate %s\n", C->idc);
+}
